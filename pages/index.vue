@@ -6,19 +6,25 @@ interface ITodo {
   status: boolean
 }
 
-const todos = ref<ITodo[]>([])
+const todoStore = useTodoStore();
+
+const { getTodo } = todoStore
+const { todos } = storeToRefs(todoStore)
+
 const newTodo = ref<string>('')
+
+getTodo()
 
 const addTodo = () => {
   if (newTodo.value.trim() !== '') {
-    todos.value.push({ title: newTodo.value, status: false })
-
+    // todos.value.push({ title: newTodo.value, status: false })
+ 
     newTodo.value = ''
   }
 }
 
 const removeTodo = (index: number) => {
-  todos.value.splice(index, 1)
+  // todos.value.splice(index, 1)
 }
 
 </script>
