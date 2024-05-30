@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
 
 interface ITodo {
+  id: number
   title: string
-  status: boolean
+  isDone: boolean
 }
 
 export const useTodoStore = defineStore('todos', () => {
@@ -25,8 +26,77 @@ export const useTodoStore = defineStore('todos', () => {
     }
   }
 
+  const addTodo = async (todo: string) => {
+    const { baseUrl, apiKey, secretKey } = useAppConfig()
+
+    const { data, error } = await useFetch<ITodo[]>('rest/v1/todos', {
+      baseURL: baseUrl,
+      method: 'post',
+      headers: {
+        apikey: apiKey,
+        Authorization: `Bearer ${secretKey}` 
+      },
+      body: {
+        title: todo,
+        isDone: false
+      }
+    })
+
+    if (error.value) {
+      console.error(error.value)
+      return
+    }
+
+    todos.value = data.value
+
+  }
+
+  const updateTodo = async (id: number, status: boolean) => {
+    const { baseUrl, apiKey, secretKey } = useAppConfig()
+
+    const { data, error } = await useFetch<ITodo[]>(`rest/v1/todos?id=eq.${id}`, {
+      baseURL: baseUrl,
+      method: 'patch',
+      headers: {
+        apikey: apiKey,
+        Authorization: `Bearer ${secretKey}` 
+      },
+      body: {
+        isDone: status
+      }
+    })
+
+    if (error.value) {
+      console.error(error.value)
+      return
+    }
+
+    todos.value = data.value
+  }
+
+  const deleteTodo = async (id: number) => {
+    const { baseUrl, apiKey, secretKey } = useAppConfig()
+
+    const { data, error } = await useFetch<ITodo[]>(`rest/v1/todos?id=eq.${id}`, {
+      baseURL: baseUrl,
+      method: 'delete',
+      headers: {
+        apikey: apiKey,
+        Authorization: `Bearer ${secretKey}` 
+      }
+    })
+
+    if (error.value) {
+      console.error(error.value)
+      return
+    }
+  }
+
   return {
     todos,
-    getTodo
+    getTodo,
+    addTodo,
+    updateTodo,
+    deleteTodo
   }
 })

@@ -8,23 +8,37 @@ interface ITodo {
 
 const todoStore = useTodoStore();
 
-const { getTodo } = todoStore
+const { getTodo, addTodo: addTodoSupabase, updateTodo, deleteTodo } = todoStore
 const { todos } = storeToRefs(todoStore)
 
 const newTodo = ref<string>('')
 
 getTodo()
 
-const addTodo = () => {
+const addTodo = async () => {
   if (newTodo.value.trim() !== '') {
     // todos.value.push({ title: newTodo.value, status: false })
+
+    await addTodoSupabase(newTodo.value)
  
     newTodo.value = ''
   }
+
+  await getTodo()
 }
 
-const removeTodo = (index: number) => {
+const updateTodoHandler = async (id: number, status: boolean) => {
+  await updateTodo(id, status)
+
+  await getTodo()
+}
+
+const removeTodo = async (id: number) => {
   // todos.value.splice(index, 1)
+
+  await deleteTodo(id)
+
+  await getTodo()
 }
 
 </script>
@@ -44,16 +58,24 @@ const removeTodo = (index: number) => {
       <button class="p-2 bg-blue-400 text-white" @click="addTodo">Tambah</button>
     </div>
 
-    <div 
+    <!-- <div 
       class="flex gap-2 justify-between pb-2 border-b-[1px] border-gray-300" 
       v-for="(todo, index) in todos" :key="index"
     >
       <div class="flex gap-2">
-        <input v-model="todo.status" type="checkbox">
-        <span :class="{ 'line-through': todo.status }">{{ todo.title }}</span>
+        <input v-model="todo.isDone" type="checkbox" @change="updateTodoHandler(todo.id, todo.isDone)">
+        <span :class="{ 'line-through': todo.isDone }">{{ todo.title }}</span>
       </div>
       <button @click="removeTodo(index)">Hapus</button>
-    </div>
+    </div> -->
+
+    <TodoItem
+      v-for="(todo, index) in todos"
+      :key="index"
+      :todo="todo"
+      @update-todo="updateTodoHandler"
+      @remove-todo="removeTodo"
+    />
   </div>
 </template>
 
