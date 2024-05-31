@@ -4,6 +4,7 @@ interface ITodo {
   id: number
   title: string
   isDone: boolean
+  category: number
 }
 
 export const useTodoStore = defineStore('todos', () => {
@@ -26,7 +27,7 @@ export const useTodoStore = defineStore('todos', () => {
     }
   }
 
-  const addTodo = async (todo: string) => {
+  const addTodo = async (todo: string, category: number) => {
     const { baseUrl, apiKey, secretKey } = useAppConfig()
 
     const { data, error } = await useFetch<ITodo[]>('rest/v1/todos', {
@@ -38,7 +39,8 @@ export const useTodoStore = defineStore('todos', () => {
       },
       body: {
         title: todo,
-        isDone: false
+        isDone: false,
+        category_id: category,
       }
     })
 
